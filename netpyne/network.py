@@ -438,7 +438,7 @@ class Network(object):
                              
                             stims[stim_info].append({'index':index,'weight':weight,'delay':delay,'threshold':threshold})   
                                 
-        print stims             
+        #print stims             
         return stims
     
     
@@ -487,7 +487,7 @@ class Network(object):
         nml_doc.networks.append(net)
 
         nml_doc.notes = 'NeuroML 2 file exported from NetPyNE'
-        
+
         gids_vs_pop_indices ={}
         populations_vs_components = {}
 
@@ -509,9 +509,9 @@ class Network(object):
                         index+=1
                         pop.instances.append(inst)
                         inst.location = neuroml.Location(cell.tags['x'],cell.tags['y'],cell.tags['z'])
-                        
+
         self._export_synapses(nml_doc)
-            
+
         if connections:
             nn = self._convertNetworkRepresentation(gids_vs_pop_indices)
 
@@ -541,39 +541,42 @@ class Network(object):
                     projection.connection_wds.append(connection)
 
                 net.projections.append(projection)
-        
+
         if stimulations:
             stims = self._convertStimulationRepresentation(gids_vs_pop_indices, nml_doc)
-            
+
             for stim_info in stims.keys():
                 name_stim, post_pop, rate, noise, synMech = stim_info
-                
+
                 print("Adding stim: %s"%[stim_info])
-                
+
                 if noise==0:
                     source = neuroml.SpikeGenerator(id=name_stim,period="%ss"%(1./rate))
                     nml_doc.spike_generators.append(source)
+                elif noise==1:
+                    source = neuroml.SpikeGeneratorPoisson(id=name_stim,average_rate="%s Hz"%(rate))
+                    nml_doc.spike_generator_poissons.append(source)
                 else:
                     raise Exception("Noise = %s is not yet supported!"%noise)
-                    
-                
+
+
                 stim_pop = neuroml.Population(id='Pop_%s'%name_stim,component=source.id,size=len(stims[stim_info]))
                 net.populations.append(stim_pop)
-                
-                
+
+
                 proj = neuroml.Projection(id="NetConn_%s__%s"%(name_stim, post_pop), 
                       presynaptic_population=stim_pop.id, 
                       postsynaptic_population=post_pop, 
                       synapse=synMech)
-                      
+
                 net.projections.append(proj)
-                
+
                 count = 0
                 for stim in stims[stim_info]:
                     print("  Adding stim: %s"%stim)
 
                     connection = neuroml.ConnectionWD(id=count, \
-                            pre_cell_id="../%s[%i]"%(stim_pop.id, 0), \
+                            pre_cell_id="../%s[%i]"%(stim_pop.id, stim['index']), \
                             pre_segment_id=0, \
                             pre_fraction_along=0.5,
                             post_cell_id="../%s/%i/%s"%(post_pop, stim['index'], populations_vs_components[post_pop]), \
@@ -584,21 +587,21 @@ class Network(object):
                     count+=1
 
                     proj.connection_wds.append(connection)
-            
+
 
         nml_file_name = '%s.net.nml'%reference
 
         writers.NeuroMLWriter.write(nml_doc, nml_file_name)
-        
+
         '''
         from pyneuroml.lems import LEMSSimulation
          
         ls = LEMSSimulation('Sim_%s'%reference, f.cfg['dt'],f.cfg['duration'],reference)
         
         ls.include_neuroml2_file(nml_file_name)'''
-        
+
         import pyneuroml.lems
-        
+
         pyneuroml.lems.generate_lems_file_for_neuroml("Sim_%s"%reference, 
                                    nml_file_name, 
                                    reference, 
@@ -615,8 +618,8 @@ class Network(object):
                                    gen_saves_for_only_populations = populations_vs_components.keys(),
                                    save_all_segments = False,
                                    seed=1234)
-        
 
 
-   
+
+
 
