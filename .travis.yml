@@ -46,7 +46,7 @@ script:
     - python M1/M1_run.py
     - cd ../RL_arm
     - $NEURON_HOME/bin/nrnivmodl
-    - python RL_arm/main.py
+    - python main.py
 
 
 notifications: 
