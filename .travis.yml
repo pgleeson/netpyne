@@ -29,19 +29,21 @@ install:
   
 
 script:
-    - cp examples/HHTut/HHTut.py doc/source/code/
-    - cd doc/source/code/
-    - $NEURON_HOME/bin/nrnivmodl mod
-    - python tut1.py
-    - python tut2.py
-    - python tut3.py
-    - python tut5.py
-    - python tut6.py
-    - python tut_import.py
-    - cd ../../../examples
-    - python HHTut/HHTut_run.py
-    - python HybridTut/HybridTut_run.py
-    - cd M1
+    # - cp examples/HHTut/HHTut.py doc/source/code/
+    # - cd doc/source/code/
+    # - $NEURON_HOME/bin/nrnivmodl mod
+    # - python tut1.py
+    # - python tut2.py
+    # - python tut3.py
+    # - python tut5.py
+    # - python tut6.py
+    # - python tut_import.py
+    - cd examples/HHTut
+    - python HHTut_run.py -nogui
+    - cd ../HybridTut
+    - $NEURON_HOME/bin/nrnivmodl
+    - python HybridTut_run.py
+    - cd ../M1
     - $NEURON_HOME/bin/nrnivmodl
     - python M1/M1_run.py
     - cd ../RL_arm
