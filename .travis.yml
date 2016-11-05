@@ -20,10 +20,13 @@ virtualenv:
     system_site_packages: true  
 
 install:
+    # Install OMV to facilitate installation of packages below
     - pip install git+https://github.com/OpenSourceBrain/osb-model-validation
-    
     # Need to pre install NEURON so nrnivmodl can be run targeting mod files in a different directory
     - omv install NEURON
+    # Need to pre install pyNeuroML to test export to NeuroML 2
+    - omv install pyNeuroML
+    # Main install for NetPyNE
     - python setup.py install
     - export NEURON_HOME=/home/travis/neuron/nrn/x86_64/
 
