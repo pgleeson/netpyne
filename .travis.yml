@@ -9,6 +9,7 @@ addons:
     - python-numpy 
     - python-scipy 
     - python-matplotlib 
+    - python-tk
     - python-sympy
     - python-tables 
 
